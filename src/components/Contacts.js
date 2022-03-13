@@ -57,6 +57,7 @@ const Contacts = () => {
                 <th>Mobile</th>
                 <th>Email</th>
                 <th>Actions</th>
+                <th>Act</th>
               </tr>
             </thead>
             <tbody>
