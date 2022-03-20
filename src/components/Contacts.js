@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
 import Contactform from "./Contactform";
 import firebaseDb from "../firebase";
+import { toast } from "react-toastify";
 
 const Contacts = () => {
   var [contactObjects, setContactObjects] = useState({});
   var [currentId, setCurrentId] = useState("");
 
   useEffect(() => {
+    localStorage.setItem("books", JSON.stringify(contactObjects));
+  }, [contactObjects]);
+
+  useEffect(() => {
     firebaseDb.child("contacts").on("value", (snapshot) => {
-      if (snapshot.val() != null)
+      if (snapshot.val() != null) {
         setContactObjects({
           ...snapshot.val(),
         });
-      else setContactObjects({});
+      } else setContactObjects({});
     });
   }, []);
 
@@ -32,17 +37,36 @@ const Contacts = () => {
   const onDelete = (key) => {
     if (window.confirm("Are you sure to delete this record")) {
       firebaseDb.child(`contacts/${key}`).remove((err) => {
-        if (err) console.log(err);
-        else setCurrentId("");
+        if (err) {
+          toast.error(err);
+        } else {
+          toast.success("Contact Deleted Successfully");
+        }
+        // } setCurrentId("");
       });
     }
   };
+
+  window.addEventListener("online", changeStatus);
+  window.addEventListener("offline", changeStatus);
+
+  function changeStatus(ev) {
+    document.getElementById("status").textContent = ev.type.toUpperCase();
+    // if (ev.type == "online") {
+    //   setCurrentId("");
+    // } else {
+    //   setCurrentId([0]);
+    // }
+  }
 
   return (
     <>
       <div className="jumbotron jumbotron-fluid">
         <div className="container">
           <h1 className="display-4 text-center">Register</h1>
+          <h1 className="display-4 text-center">
+            You are currently <span id="status">UNKNOWN</span>
+          </h1>
         </div>
       </div>
       <div className="row">
